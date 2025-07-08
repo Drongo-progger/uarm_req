@@ -1,0 +1,128 @@
+<!-- src/main/resources/static/index.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Заявка</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f4f4;
+            padding: 40px;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #1d4ed8;
+        }
+        .status {
+            text-align: center;
+            margin-top: 16px;
+            font-weight: 500;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h2>Оставить заявку</h2>
+    <form id="applicationForm">
+        <label>Имя клиента:</label>
+        <input type="text" name="customerName" required />
+
+        <label>Название компании:</label>
+        <input type="text" name="companyName" />
+
+        <label>Телефон:</label>
+        <input type="text" name="phone" required />
+
+        <label>Email:</label>
+        <input type="email" name="email" required />
+
+        <label>Продукт:</label>
+        <input type="text" name="interestedProduct" required />
+
+        <label>Сообщение:</label>
+        <textarea name="message" rows="4"></textarea>
+
+        <button type="submit">Отправить</button>
+    </form>
+
+    <div id="status" class="status"></div>
+</div>
+
+<script>
+    const form = document.getElementById('applicationForm');
+    const status = document.getElementById('status');
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        status.textContent = '';
+        status.className = 'status';
+
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((v, k) => data[k] = v);
+
+        try {
+            const response = await fetch('/api/public/requests', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                status.textContent = 'Заявка успешно отправлена!';
+                status.classList.add('success');
+                form.reset();
+            } else {
+                throw new Error('Ошибка при отправке');
+            }
+        } catch (err) {
+            status.textContent = 'Произошла ошибка. Попробуйте позже.';
+            status.classList.add('error');
+        }
+    });
+</script>
+</body>
+</html>

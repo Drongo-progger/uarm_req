@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Заявка</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+<div class="bg-white p-8 rounded shadow-md w-full max-w-xl">
+  <h2 class="text-2xl font-semibold text-center mb-6">Форма заявки</h2>
+  <form id="requestForm" class="space-y-4">
+    <input type="text" name="customerName" placeholder="Имя клиента" required class="w-full p-3 border rounded" />
+    <input type="text" name="companyName" placeholder="Название компании" class="w-full p-3 border rounded" />
+    <input type="text" name="phone" placeholder="Телефон" required class="w-full p-3 border rounded" />
+    <input type="email" name="email" placeholder="Email" required class="w-full p-3 border rounded" />
+    <input type="text" name="interestedProduct" placeholder="Продукт" class="w-full p-3 border rounded" />
+    <textarea name="message" placeholder="Сообщение" rows="4" class="w-full p-3 border rounded"></textarea>
+    <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded w-full hover:bg-blue-700">Отправить</button>
+  </form>
+  <p id="statusMessage" class="mt-4 text-center text-green-600 hidden"></p>
+</div>
+
+<script>
+  document.getElementById("requestForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = {
+      customerName: form.customerName.value,
+      companyName: form.companyName.value,
+      phone: form.phone.value,
+      email: form.email.value,
+      interestedProduct: form.interestedProduct.value,
+      message: form.message.value
+    };
+
+    try {
+      const res = await fetch("/api/public/requests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+      document.getElementById("statusMessage").textContent = result.message;
+      document.getElementById("statusMessage").classList.remove("hidden");
+      form.reset();
+    } catch (error) {
+      document.getElementById("statusMessage").textContent = "Ошибка при отправке.";
+      document.getElementById("statusMessage").classList.remove("hidden");
+    }
+  });
+</script>
+</body>
+</html>
